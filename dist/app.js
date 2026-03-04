@@ -134,6 +134,8 @@ class MemoryGame {
         this.resetGame();
     }
     startTimer() {
+        if (this.timerInterval)
+            clearInterval(this.timerInterval);
         this.timeElement.textContent = this.formatTime(this.timeLeft);
         this.timerInterval = window.setInterval(() => {
             this.timeLeft--;
