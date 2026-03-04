@@ -11,6 +11,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 class MemoryGame {
     constructor() {
         this.board = document.getElementById("game-board");
+        this.timeElement = document.getElementById("time");
         this.scoreElement = document.getElementById("score");
         this.bestScoreElement = document.getElementById("best-score");
         this.cards = [];
@@ -18,6 +19,8 @@ class MemoryGame {
         this.score = 0;
         this.bestScore = 0;
         this.lockBoard = false;
+        this.timeLeft = 60;
+        this.timerInterval = null;
         this.bestScore = Number(localStorage.getItem("bestScore")) || 0;
         this.bestScoreElement.textContent = this.bestScore.toString();
         this.init();
@@ -29,6 +32,7 @@ class MemoryGame {
             this.createCards(pokemonCards);
             this.shuffleCards();
             this.renderCards();
+            this.startTimer();
         });
     }
     fetchPokemonCards() {
@@ -117,12 +121,54 @@ class MemoryGame {
         }
     }
     win() {
-        alert(`You Win!`);
+        if (this.timerInterval)
+            clearInterval(this.timerInterval);
+        this.score += this.timeLeft;
+        this.updateScore();
         if (this.score > this.bestScore) {
             this.bestScore = this.score;
             localStorage.setItem("bestScore", this.bestScore.toString());
+            this.bestScoreElement.textContent = this.bestScore.toString();
         }
-        location.reload();
+        alert(`You Win! Your score: ${this.score}`);
+        this.resetGame();
+    }
+    startTimer() {
+        this.timeElement.textContent = this.formatTime(this.timeLeft);
+        this.timerInterval = window.setInterval(() => {
+            this.timeLeft--;
+            this.timeElement.textContent = this.formatTime(this.timeLeft);
+            if (this.timeLeft <= 0) {
+                this.gameOver();
+            }
+        }, 1000);
+    }
+    formatTime(seconds) {
+        const mins = Math.floor(seconds / 60);
+        const secs = seconds % 60;
+        const formattedMins = mins < 10 ? `0${mins}` : mins.toString();
+        const formattedSecs = secs < 10 ? `0${secs}` : secs.toString();
+        return `${formattedMins}:${formattedSecs}`;
+    }
+    gameOver() {
+        if (this.timerInterval)
+            clearInterval(this.timerInterval);
+        if (this.score > this.bestScore) {
+            this.bestScore = this.score;
+            localStorage.setItem("bestScore", this.bestScore.toString());
+            this.bestScoreElement.textContent = this.bestScore.toString();
+        }
+        alert("Game Over! Time's up!");
+        this.resetGame();
+    }
+    resetGame() {
+        this.timeLeft = 60;
+        this.score = 0;
+        this.cards = [];
+        this.flippedCards = [];
+        this.board.innerHTML = "";
+        this.updateScore();
+        this.init();
     }
 }
 new MemoryGame();

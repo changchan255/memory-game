@@ -6,12 +6,16 @@
 }
 
 body {
+    background-color: #f0f0f0;
+    padding: 15px;
+}
+
+main {
     display: flex;
     justify-content: center;
     align-items: center;
     flex-direction: column;
     height: 100vh;
-    background-color: #f0f0f0;
 }
 
 h3 {
@@ -21,15 +25,15 @@ h3 {
 
 .game-board {
     display: grid;
-    grid-template-columns: repeat(4, 120px);
+    grid-template-columns: repeat(4, 100px);
     grid-gap: 15px;
     margin-top: 20px;
 }
 
 
 .card {
-    width: 120px;
-    height: 120px;
+    width: 100px;
+    height: 100px;
     perspective: 1000px;
     cursor: pointer;
     margin: 10px;

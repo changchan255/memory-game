@@ -8,6 +8,7 @@ interface Card {
 
 class MemoryGame {
     private board = document.getElementById("game-board")!;
+    private timeElement = document.getElementById("time")!;
     private scoreElement = document.getElementById("score")!;
     private bestScoreElement = document.getElementById("best-score")!;
 
@@ -16,6 +17,8 @@ class MemoryGame {
     private score = 0;
     private bestScore = 0;
     private lockBoard = false;
+    private timeLeft = 60;
+    private timerInterval: number | null = null;
 
     constructor() {
         this.bestScore = Number(localStorage.getItem("bestScore")) || 0;
@@ -29,6 +32,7 @@ class MemoryGame {
         this.createCards(pokemonCards);
         this.shuffleCards();
         this.renderCards();
+        this.startTimer();
     }
 
     async fetchPokemonCards() {
@@ -133,14 +137,65 @@ class MemoryGame {
     }
 
     win() {
-        alert(`You Win!`);   
+        if (this.timerInterval) clearInterval(this.timerInterval);  
+
+        this.score += this.timeLeft;
+        this.updateScore();
         
         if (this.score > this.bestScore) {
             this.bestScore = this.score;
             localStorage.setItem("bestScore", this.bestScore.toString());
+            this.bestScoreElement.textContent = this.bestScore.toString();
         }
-        location.reload();
+
+        alert(`You Win! Your score: ${this.score}`);
+        this.resetGame();
         }
+
+    startTimer() {
+        this.timeElement.textContent = this.formatTime(this.timeLeft);  
+        this.timerInterval = window.setInterval(() => {
+            this.timeLeft--;
+            this.timeElement.textContent = this.formatTime(this.timeLeft);
+            
+            if (this.timeLeft <= 0) {
+                this.gameOver();
+            }
+        }, 1000);
+    }
+
+    private formatTime(seconds: number): string {
+        const mins = Math.floor(seconds / 60);
+        const secs = seconds % 60;
+        
+        const formattedMins = mins < 10 ? `0${mins}` : mins.toString();
+        const formattedSecs = secs < 10 ? `0${secs}` : secs.toString();
+
+        return `${formattedMins}:${formattedSecs}`;
+    }
+
+    gameOver() {
+        if (this.timerInterval) clearInterval(this.timerInterval);
+
+        if (this.score > this.bestScore) {
+            this.bestScore = this.score;
+            localStorage.setItem("bestScore", this.bestScore.toString());
+            this.bestScoreElement.textContent = this.bestScore.toString();
+        }
+
+        alert("Game Over! Time's up!");
+        this.resetGame();
+    }
+
+    resetGame() {
+        this.timeLeft = 60;
+        this.score = 0;
+        this.cards = [];
+        this.flippedCards = [];
+        this.board.innerHTML = "";
+        this.updateScore(); 
+        this.init();
+    }
 }
 
 new MemoryGame();
