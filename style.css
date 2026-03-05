@@ -14,7 +14,7 @@ main {
     justify-content: center;
     align-items: center;
     flex-direction: column;
-    height: 100vh;
+    min-height: 100vh;
 }
 
 h3 {
@@ -22,20 +22,53 @@ h3 {
     font-weight: 400;
 }
 
+.menu {
+    text-align: center;
+    margin-top: 50px;
+}
+
+.difficulty-button button {
+    padding: 10px 20px;
+    margin: 10px;
+    font-size: 16px;
+    cursor: pointer;
+    border: none;
+    border-radius: 5px;
+    background-color: #f8c8dc;
+    color: #000;
+    transition: background-color 0.3s ease;
+}
+
+.game-container {
+    display: none;
+}
+
+.game-header {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+.score {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    
+}
+
 .game-board {
     display: grid;
-    grid-template-columns: repeat(4, 100px);
-    grid-gap: 15px;
+    gap: 10px;
+    justify-content: center;
+    width: min(90vw, 600px);
     margin-top: 20px;
 }
 
-
 .card {
-    width: 100px;
-    height: 100px;
+    aspect-ratio: 1 / 1;
     perspective: 1000px;
     cursor: pointer;
-    margin: 10px;
 }
 
 .card-inner {

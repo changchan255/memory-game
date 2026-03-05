@@ -8,11 +8,26 @@
 </head>
 <body>
     <main>
-     <h1>Memory Game</h1>
+      <h1>Memory Game</h1>
+      <div class="menu">
+     <div class="difficulty-button">
+        <button data-size="4">Easy (4x4)</button>
+        <button data-size="6">Medium (6x6)</button>
+        <button data-size="8">Hard (8x8)</button>
+     </div>
+     </div>
+
+     <div class="game-container" id="game-container">
+      <div class="game-header">
      <h3>Time: <span id="time">01:00</span></h3>
-     <h3>Score: <span id="score">0</span></h3>
-     <h3>Best score: <span id="best-score">0</span></h3>
+     <h3 class="score">
+       <div>Score: <span id="score">0</span></div>
+       <div>|</div>
+        <div>Best: <span id="best-score">0</span></div>
+     </h3>
+     </div>
      <div class="game-board" id="game-board">
+    </div>
        
      </div>
     </main>

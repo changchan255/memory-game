@@ -11,6 +11,8 @@ class MemoryGame {
     private timeElement = document.getElementById("time")!;
     private scoreElement = document.getElementById("score")!;
     private bestScoreElement = document.getElementById("best-score")!;
+    private menu = document.querySelector(".menu") as HTMLElement;
+    private gameContainer = document.getElementById("game-container")!;
 
     private cards: Card[] = [];
     private flippedCards: Card[] = [];
@@ -19,10 +21,36 @@ class MemoryGame {
     private lockBoard = false;
     private timeLeft = 60;
     private timerInterval: number | null = null;
+    private gridSize: number = 4;
 
     constructor() {
         this.bestScore = Number(localStorage.getItem("bestScore")) || 0;
         this.bestScoreElement.textContent = this.bestScore.toString();
+        this.setupMenu();
+    }
+
+    setupMenu() {
+        const buttons = document.querySelectorAll(".difficulty-button button");
+        buttons.forEach(button => {
+            button.addEventListener("click", () => {
+               const size = Number(button.getAttribute("data-size"));
+               this.startGame(size);
+            }); 
+        });
+    }
+
+    startGame(size: number) {
+        this.gridSize = size;
+        
+
+        if (size === 4) this.timeLeft = 60;
+        else if (size === 6) this.timeLeft = 120;
+        else if (size === 8) this.timeLeft = 180;
+       
+        this.menu.style.display = "none";
+        this.gameContainer.style.display = "block";
+
+        this.resetGame();
         this.init();
     }
 
@@ -36,7 +64,9 @@ class MemoryGame {
     }
 
     async fetchPokemonCards() {
-        const id = Array.from({ length: 8 }, () => Math.floor(Math.random() * 151) + 1);
+        const totalPairs = (this.gridSize * this.gridSize) / 2;
+
+        const id = Array.from({ length: totalPairs }, () => Math.floor(Math.random() * 151) + 1);
 
         const responses = await Promise.all(
             id.map((id) => fetch(`https://pokeapi.co/api/v2/pokemon/${id}`)
@@ -67,6 +97,7 @@ class MemoryGame {
 
     renderCards() {
         this.board.innerHTML = "";
+        this.board.style.gridTemplateColumns = `repeat(${this.gridSize}, 1fr)`;
         this.cards.forEach((card) => {
             const cardElement = document.createElement("div");
             cardElement.className = "card";
@@ -150,6 +181,7 @@ class MemoryGame {
 
         alert(`You Win! Your score: ${this.score}`);
         this.resetGame();
+        this.showMenu();
         }
 
     startTimer() {
@@ -186,16 +218,29 @@ class MemoryGame {
 
         alert("Game Over! Time's up!");
         this.resetGame();
+        this.showMenu();
     }
 
     resetGame() {
-        this.timeLeft = 60;
+        if (this.timerInterval) {
+            clearInterval(this.timerInterval);
+            this.timerInterval = null;
+        }
+
         this.score = 0;
         this.cards = [];
         this.flippedCards = [];
         this.board.innerHTML = "";
         this.updateScore(); 
-        this.init();
+
+        if (this.gridSize === 4) this.timeLeft = 60;
+        else if (this.gridSize === 6) this.timeLeft = 120;
+        else if (this.gridSize === 8) this.timeLeft = 180;
+    }
+
+    private showMenu() {
+        this.menu.style.display = "block";
+        this.gameContainer.style.display = "none";
     }
 }
 

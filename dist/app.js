@@ -14,6 +14,8 @@ class MemoryGame {
         this.timeElement = document.getElementById("time");
         this.scoreElement = document.getElementById("score");
         this.bestScoreElement = document.getElementById("best-score");
+        this.menu = document.querySelector(".menu");
+        this.gameContainer = document.getElementById("game-container");
         this.cards = [];
         this.flippedCards = [];
         this.score = 0;
@@ -21,8 +23,31 @@ class MemoryGame {
         this.lockBoard = false;
         this.timeLeft = 60;
         this.timerInterval = null;
+        this.gridSize = 4;
         this.bestScore = Number(localStorage.getItem("bestScore")) || 0;
         this.bestScoreElement.textContent = this.bestScore.toString();
+        this.setupMenu();
+    }
+    setupMenu() {
+        const buttons = document.querySelectorAll(".difficulty-button button");
+        buttons.forEach(button => {
+            button.addEventListener("click", () => {
+                const size = Number(button.getAttribute("data-size"));
+                this.startGame(size);
+            });
+        });
+    }
+    startGame(size) {
+        this.gridSize = size;
+        if (size === 4)
+            this.timeLeft = 60;
+        else if (size === 6)
+            this.timeLeft = 120;
+        else if (size === 8)
+            this.timeLeft = 180;
+        this.menu.style.display = "none";
+        this.gameContainer.style.display = "block";
+        this.resetGame();
         this.init();
     }
     init() {
@@ -37,7 +62,8 @@ class MemoryGame {
     }
     fetchPokemonCards() {
         return __awaiter(this, void 0, void 0, function* () {
-            const id = Array.from({ length: 8 }, () => Math.floor(Math.random() * 151) + 1);
+            const totalPairs = (this.gridSize * this.gridSize) / 2;
+            const id = Array.from({ length: totalPairs }, () => Math.floor(Math.random() * 151) + 1);
             const responses = yield Promise.all(id.map((id) => fetch(`https://pokeapi.co/api/v2/pokemon/${id}`)));
             const data = yield Promise.all(responses.map((res) => res.json()));
             return data.map((pokemon) => ({
@@ -61,6 +87,7 @@ class MemoryGame {
     }
     renderCards() {
         this.board.innerHTML = "";
+        this.board.style.gridTemplateColumns = `repeat(${this.gridSize}, 1fr)`;
         this.cards.forEach((card) => {
             const cardElement = document.createElement("div");
             cardElement.className = "card";
@@ -132,6 +159,7 @@ class MemoryGame {
         }
         alert(`You Win! Your score: ${this.score}`);
         this.resetGame();
+        this.showMenu();
     }
     startTimer() {
         if (this.timerInterval)
@@ -162,15 +190,28 @@ class MemoryGame {
         }
         alert("Game Over! Time's up!");
         this.resetGame();
+        this.showMenu();
     }
     resetGame() {
-        this.timeLeft = 60;
+        if (this.timerInterval) {
+            clearInterval(this.timerInterval);
+            this.timerInterval = null;
+        }
         this.score = 0;
         this.cards = [];
         this.flippedCards = [];
         this.board.innerHTML = "";
         this.updateScore();
-        this.init();
+        if (this.gridSize === 4)
+            this.timeLeft = 60;
+        else if (this.gridSize === 6)
+            this.timeLeft = 120;
+        else if (this.gridSize === 8)
+            this.timeLeft = 180;
+    }
+    showMenu() {
+        this.menu.style.display = "block";
+        this.gameContainer.style.display = "none";
     }
 }
 new MemoryGame();
