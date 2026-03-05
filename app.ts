@@ -14,6 +14,7 @@ class MemoryGame {
     private menu = document.querySelector(".menu") as HTMLElement;
     private gameContainer = document.getElementById("game-container")!;
 
+    private gameActive = false;
     private cards: Card[] = [];
     private flippedCards: Card[] = [];
     private score = 0;
@@ -41,6 +42,7 @@ class MemoryGame {
 
     startGame(size: number) {
         this.gridSize = size;
+        this.gameActive = true;
         
 
         if (size === 4) this.timeLeft = 60;
@@ -116,7 +118,7 @@ class MemoryGame {
     }
 
     flipCard(card: Card, cardElement: HTMLElement) {
-        if (this.lockBoard || card.flipped || card.matched) return;
+        if (!this.gameActive || this.lockBoard || card.flipped || card.matched) return;
 
         card.flipped = true;
         cardElement.classList.add("flipped");
@@ -157,6 +159,8 @@ class MemoryGame {
     }
 
     resetTurn() {
+        if (!this.gameActive) return;
+
         this.flippedCards = [];
         this.lockBoard = false;
 
@@ -168,6 +172,9 @@ class MemoryGame {
     }
 
     win() {
+        if (!this.gameActive) return;
+        this.gameActive = false;
+
         if (this.timerInterval) clearInterval(this.timerInterval);  
 
         this.score += this.timeLeft;
@@ -208,6 +215,9 @@ class MemoryGame {
     }
 
     gameOver() {
+        if (!this.gameActive) return;
+        this.gameActive = false;
+
         if (this.timerInterval) clearInterval(this.timerInterval);
 
         if (this.score > this.bestScore) {

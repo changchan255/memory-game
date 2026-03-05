@@ -16,6 +16,7 @@ class MemoryGame {
         this.bestScoreElement = document.getElementById("best-score");
         this.menu = document.querySelector(".menu");
         this.gameContainer = document.getElementById("game-container");
+        this.gameActive = false;
         this.cards = [];
         this.flippedCards = [];
         this.score = 0;
@@ -39,6 +40,7 @@ class MemoryGame {
     }
     startGame(size) {
         this.gridSize = size;
+        this.gameActive = true;
         if (size === 4)
             this.timeLeft = 60;
         else if (size === 6)
@@ -104,7 +106,7 @@ class MemoryGame {
         });
     }
     flipCard(card, cardElement) {
-        if (this.lockBoard || card.flipped || card.matched)
+        if (!this.gameActive || this.lockBoard || card.flipped || card.matched)
             return;
         card.flipped = true;
         cardElement.classList.add("flipped");
@@ -140,6 +142,8 @@ class MemoryGame {
         this.scoreElement.textContent = this.score.toString();
     }
     resetTurn() {
+        if (!this.gameActive)
+            return;
         this.flippedCards = [];
         this.lockBoard = false;
         const allMatched = this.cards.every(card => card.matched);
@@ -148,6 +152,9 @@ class MemoryGame {
         }
     }
     win() {
+        if (!this.gameActive)
+            return;
+        this.gameActive = false;
         if (this.timerInterval)
             clearInterval(this.timerInterval);
         this.score += this.timeLeft;
@@ -181,6 +188,9 @@ class MemoryGame {
         return `${formattedMins}:${formattedSecs}`;
     }
     gameOver() {
+        if (!this.gameActive)
+            return;
+        this.gameActive = false;
         if (this.timerInterval)
             clearInterval(this.timerInterval);
         if (this.score > this.bestScore) {
